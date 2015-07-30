@@ -1,0 +1,290 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		379B3F491B6AD4AC005F9FEF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379B3F481B6AD4AC005F9FEF /* AppDelegate.swift */; };
+		379B3F4E1B6AD4AC005F9FEF /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 379B3F4C1B6AD4AC005F9FEF /* Main.storyboard */; };
+		379B3F501B6AD4AC005F9FEF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 379B3F4F1B6AD4AC005F9FEF /* Assets.xcassets */; };
+		379B3F531B6AD4AC005F9FEF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 379B3F511B6AD4AC005F9FEF /* LaunchScreen.storyboard */; };
+		379B3F5B1B6AD540005F9FEF /* TableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 379B3F5A1B6AD540005F9FEF /* TableViewController.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		379B3F451B6AD4AC005F9FEF /* TPTSwipingTableViewCell.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TPTSwipingTableViewCell.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		379B3F481B6AD4AC005F9FEF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		379B3F4D1B6AD4AC005F9FEF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		379B3F4F1B6AD4AC005F9FEF /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		379B3F521B6AD4AC005F9FEF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		379B3F541B6AD4AC005F9FEF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		379B3F5A1B6AD540005F9FEF /* TableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TableViewController.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		379B3F421B6AD4AC005F9FEF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		379B3F3C1B6AD4AC005F9FEF = {
+			isa = PBXGroup;
+			children = (
+				379B3F471B6AD4AC005F9FEF /* TPTSwipingTableViewCell */,
+				379B3F461B6AD4AC005F9FEF /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		379B3F461B6AD4AC005F9FEF /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				379B3F451B6AD4AC005F9FEF /* TPTSwipingTableViewCell.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		379B3F471B6AD4AC005F9FEF /* TPTSwipingTableViewCell */ = {
+			isa = PBXGroup;
+			children = (
+				379B3F481B6AD4AC005F9FEF /* AppDelegate.swift */,
+				379B3F5A1B6AD540005F9FEF /* TableViewController.swift */,
+				379B3F4C1B6AD4AC005F9FEF /* Main.storyboard */,
+				379B3F4F1B6AD4AC005F9FEF /* Assets.xcassets */,
+				379B3F511B6AD4AC005F9FEF /* LaunchScreen.storyboard */,
+				379B3F541B6AD4AC005F9FEF /* Info.plist */,
+			);
+			path = TPTSwipingTableViewCell;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		379B3F441B6AD4AC005F9FEF /* TPTSwipingTableViewCell */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 379B3F571B6AD4AC005F9FEF /* Build configuration list for PBXNativeTarget "TPTSwipingTableViewCell" */;
+			buildPhases = (
+				379B3F411B6AD4AC005F9FEF /* Sources */,
+				379B3F421B6AD4AC005F9FEF /* Frameworks */,
+				379B3F431B6AD4AC005F9FEF /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = TPTSwipingTableViewCell;
+			productName = TPTSwipingTableViewCell;
+			productReference = 379B3F451B6AD4AC005F9FEF /* TPTSwipingTableViewCell.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		379B3F3D1B6AD4AC005F9FEF /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0700;
+				ORGANIZATIONNAME = "Braxio Interactive";
+				TargetAttributes = {
+					379B3F441B6AD4AC005F9FEF = {
+						CreatedOnToolsVersion = 7.0;
+					};
+				};
+			};
+			buildConfigurationList = 379B3F401B6AD4AC005F9FEF /* Build configuration list for PBXProject "TPTSwipingTableViewCell" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 379B3F3C1B6AD4AC005F9FEF;
+			productRefGroup = 379B3F461B6AD4AC005F9FEF /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				379B3F441B6AD4AC005F9FEF /* TPTSwipingTableViewCell */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		379B3F431B6AD4AC005F9FEF /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				379B3F531B6AD4AC005F9FEF /* LaunchScreen.storyboard in Resources */,
+				379B3F501B6AD4AC005F9FEF /* Assets.xcassets in Resources */,
+				379B3F4E1B6AD4AC005F9FEF /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		379B3F411B6AD4AC005F9FEF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				379B3F491B6AD4AC005F9FEF /* AppDelegate.swift in Sources */,
+				379B3F5B1B6AD540005F9FEF /* TableViewController.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		379B3F4C1B6AD4AC005F9FEF /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				379B3F4D1B6AD4AC005F9FEF /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		379B3F511B6AD4AC005F9FEF /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				379B3F521B6AD4AC005F9FEF /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		379B3F551B6AD4AC005F9FEF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		379B3F561B6AD4AC005F9FEF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		379B3F581B6AD4AC005F9FEF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				INFOPLIST_FILE = TPTSwipingTableViewCell/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = come.braxio.TPTSwipingTableViewCell;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		379B3F591B6AD4AC005F9FEF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				INFOPLIST_FILE = TPTSwipingTableViewCell/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = come.braxio.TPTSwipingTableViewCell;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		379B3F401B6AD4AC005F9FEF /* Build configuration list for PBXProject "TPTSwipingTableViewCell" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				379B3F551B6AD4AC005F9FEF /* Debug */,
+				379B3F561B6AD4AC005F9FEF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		379B3F571B6AD4AC005F9FEF /* Build configuration list for PBXNativeTarget "TPTSwipingTableViewCell" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				379B3F581B6AD4AC005F9FEF /* Debug */,
+				379B3F591B6AD4AC005F9FEF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 379B3F3D1B6AD4AC005F9FEF /* Project object */;
+}
