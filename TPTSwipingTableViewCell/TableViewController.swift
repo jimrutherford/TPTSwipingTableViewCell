@@ -29,7 +29,10 @@ class TableViewController: UITableViewController {
         return tableData.count
     }
 
-
+    override func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+        return 70.0
+    }
+    
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("swipeCell", forIndexPath: indexPath)
 
