@@ -44,10 +44,11 @@ typealias TPTSwipeCompletionBlock = (TPTSwipingTableViewCell, TPTSwipeTableViewC
 class TPTSwipingTableViewCell: UITableViewCell {
     
     // MARK: - Constants
-    let kMCBounceDuration1:NSTimeInterval      = 0.2;  // Duration of the first part of the bounce animation
-    let kMCBounceDuration2:NSTimeInterval      = 0.1;  // Duration of the second part of the bounce animation
-    let kMCDurationLowLimit:NSTimeInterval     = 0.25; // Lowest duration when swiping the cell because we try to simulate velocity
-    let kMCDurationHighLimit:NSTimeInterval    = 0.1;  // Highest duration when swiping the cell because we try to simulate velocity
+    let kMCBounceDuration1:NSTimeInterval      = 0.2  // Duration of the first part of the bounce animation
+    let kMCBounceDuration2:NSTimeInterval      = 0.1  // Duration of the second part of the bounce animation
+    let kMCDurationLowLimit:NSTimeInterval     = 0.25 // Lowest duration when swiping the cell because we try to simulate velocity
+    let kMCDurationHighLimit:NSTimeInterval    = 0.1  // Highest duration when swiping the cell because we try to simulate velocity
+    let kMCBounceAmplitude:CGFloat = 20.0 // Maximum bounce amplitude when using the MCSwipeTableViewCellModeSwitch mode
     
     // MARK: - Public/Internal Properties
     
@@ -101,10 +102,12 @@ class TPTSwipingTableViewCell: UITableViewCell {
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder:aDecoder)
+        setup()
     }
     
     override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
         super.init(style:style, reuseIdentifier:reuseIdentifier)
+        setup()
     }
     
 
@@ -150,21 +153,21 @@ class TPTSwipingTableViewCell: UITableViewCell {
         completionBlock:TPTSwipeCompletionBlock)
     {
         // Depending on the state we assign the attributes
-        if (state  == .State4) {
+        if (state  == .State1) {
             completionBlock1 = completionBlock;
             view1 = view;
             color1 = color;
             modeForState1 = mode;
         }
         
-        if (state == .State4) {
+        if (state == .State2) {
             completionBlock2 = completionBlock;
             view2 = view;
             color2 = color;
             modeForState2 = mode;
         }
         
-        if (state == .State4) {
+        if (state == .State3) {
             completionBlock3 = completionBlock;
             view3 = view;
             color3 = color;
@@ -281,7 +284,13 @@ class TPTSwipingTableViewCell: UITableViewCell {
         let state = gesture.state;
         let translation = gesture.translationInView(self)
         let velocity = gesture.velocityInView(self)
-        let percentage = percentageWithOffset(CGRectGetMinX(contentScreenshotView!.frame), relativeToWidth:CGRectGetWidth(self.bounds))
+        
+        var percentage:CGFloat = 0
+        
+        if let contentView = contentScreenshotView {
+            percentage = percentageWithOffset(CGRectGetMinX(contentView.frame), relativeToWidth:CGRectGetWidth(self.bounds))
+        }
+        
         animationDuration = animationDurationWithVelocity(velocity)
         direction = directionWithPercentage(percentage)
         
@@ -309,7 +318,7 @@ class TPTSwipingTableViewCell: UITableViewCell {
             activeView = viewWithPercentage(percentage)
             currentPercentage = percentage;
             
-            var cellState:TPTSwipeTableViewCellState = stateWithPercentage(percentage)
+            let cellState:TPTSwipeTableViewCellState = stateWithPercentage(percentage)
             var cellMode: TPTSwipeTableViewCellMode = .None
             
             if cellState == .State1 && modeForState1 != .None {
@@ -333,9 +342,9 @@ class TPTSwipingTableViewCell: UITableViewCell {
             }
                 
             else {
-                [self swipeToOriginWithCompletion:^{
-                    [self executeCompletionBlock];
-                    }];
+                swipeToOriginWithCompletion({
+                    self.executeCompletionBlock()
+                })
             }
             
             // We notify the delegate that we just ended swiping.
@@ -438,80 +447,50 @@ class TPTSwipingTableViewCell: UITableViewCell {
         // Color
         let color = colorWithPercentage(currentPercentage)
         colorIndicatorView!.backgroundColor = color
-       
-        UIView.animateWithDuration(duration, delay:0, options:(.CurveEaseOut | .AllowUserInteraction), animations:{ () -> Void in
-            contentScreenshotView.frame = frame;
-            slidingView.alpha = 0;
-            slideViewWithPercentage(percentage, view:activeView, isDragging:shouldAnimateIcons)
+
+        UIView.animateWithDuration(duration, delay:0, options:[UIViewAnimationOptions.CurveEaseOut, UIViewAnimationOptions.AllowUserInteraction], animations:{ () -> Void in
+            self.contentScreenshotView!.frame = frame;
+            self.slidingView!.alpha = 0;
+            self.slideViewWithPercentage(percentage, view:self.activeView!, isDragging:self.shouldAnimateIcons)
             }, completion:{ (Bool) -> Void in
-                executeCompletionBlock()
+                self.executeCompletionBlock()
             })
 
     }
     
-    - (void)swipeToOriginWithCompletion:(void(^)(void))completion {
-    CGFloat bounceDistance = kMCBounceAmplitude * _currentPercentage;
-    
-    if ([UIView.class respondsToSelector:@selector(animateWithDuration:delay:usingSpringWithDamping:initialSpringVelocity:options:animations:completion:)]) {
-    
-    [UIView animateWithDuration:_animationDuration delay:0.0 usingSpringWithDamping:_damping initialSpringVelocity:_velocity options:UIViewAnimationOptionCurveEaseInOut animations:^{
-    
-    CGRect frame = _contentScreenshotView.frame;
-    frame.origin.x = 0;
-    _contentScreenshotView.frame = frame;
-    
-    // Clearing the indicator view
-    _colorIndicatorView.backgroundColor = self.defaultColor;
-    
-    _slidingView.alpha = 0;
-    [self slideViewWithPercentage:0 view:_activeView isDragging:NO];
-    
-    } completion:^(BOOL finished) {
-    
-    _isExited = NO;
-    [self uninstallSwipingView];
-    
-    if (completion) {
-    completion();
-    }
-    }];
-    }
-    
-    else {
-    [UIView animateWithDuration:kMCBounceDuration1 delay:0 options:(UIViewAnimationOptionCurveEaseOut) animations:^{
-    
-    CGRect frame = _contentScreenshotView.frame;
-    frame.origin.x = -bounceDistance;
-    _contentScreenshotView.frame = frame;
-    
-    _slidingView.alpha = 0;
-    [self slideViewWithPercentage:0 view:_activeView isDragging:NO];
-    
-    // Setting back the color to the default.
-    _colorIndicatorView.backgroundColor = self.defaultColor;
-    
-    } completion:^(BOOL finished1) {
-    
-    [UIView animateWithDuration:kMCBounceDuration2 delay:0 options:UIViewAnimationOptionCurveEaseIn animations:^{
-    
-    CGRect frame = _contentScreenshotView.frame;
-    frame.origin.x = 0;
-    _contentScreenshotView.frame = frame;
-    
-    // Clearing the indicator view
-    _colorIndicatorView.backgroundColor = [UIColor clearColor];
-    
-    } completion:^(BOOL finished2) {
-    
-    _isExited = NO;
-    [self uninstallSwipingView];
-    
-    if (completion) {
-    completion();
-    }
-    }];
-    }];
-    }
+    func swipeToOriginWithCompletion(completion:()->Void) {
+        
+        /*UIView.animateWithDuration(duration:animationDuration,
+            delay:delay,
+            usingSpringWithDamping: damping,
+            initialSpringVelocity: velocity,
+            options: .CurveEaseOut,*/
+            
+        UIView.animateWithDuration(animationDuration, delay:0, options:[UIViewAnimationOptions.CurveEaseOut, UIViewAnimationOptions.AllowUserInteraction],
+            animations: { () -> Void in
+                var frame = self.contentScreenshotView!.frame;
+                frame.origin.x = 0;
+                self.contentScreenshotView!.frame = frame
+                
+                // Clearing the indicator view
+                self.colorIndicatorView!.backgroundColor = self.defaultColor
+                
+                self.slidingView!.alpha = 0;
+                self.slideViewWithPercentage(0, view:self.activeView!, isDragging:false)
+            }, completion: { (Bool) -> Void in
+                
+                self.isExited = false;
+                self.uninstallSwipingView()
+                
+                completion();
+                
+        })
+        
+        
+
+        
+        
+        
     }
 
     // MARK: - Percentage
