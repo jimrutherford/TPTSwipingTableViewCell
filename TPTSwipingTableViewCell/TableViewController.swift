@@ -36,7 +36,7 @@ class TableViewController: UITableViewController {
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell:TPTSwipingTableViewCell = tableView.dequeueReusableCellWithIdentifier("swipeCell", forIndexPath: indexPath) as! TPTSwipingTableViewCell
 
-        cell.textLabel!.text = tableData[indexPath.row]
+        cell.myLabel!.text = tableData[indexPath.row]
 
         configureCell(cell, forRowAtIndexPath:indexPath)
         

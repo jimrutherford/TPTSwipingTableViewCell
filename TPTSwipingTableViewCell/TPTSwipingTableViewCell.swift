@@ -29,11 +29,11 @@ enum TPTSwipeTableViewCellDirection:Int {
 }
 
 /**
-*  `MCSwipeCompletionBlock`
+*  `TPTSwipeCompletionBlock`
 *
 *  @param cell  Currently swiped `MCSwipeTableViewCell`.
-*  @param state `MCSwipeTableViewCellState` which has been triggered.
-*  @param mode  `MCSwipeTableViewCellMode` used for for swiping.
+*  @param state `TPTSwipeTableViewCellState` which has been triggered.
+*  @param mode  `TPTSwipeTableViewCellMode` used for for swiping.
 *
 *  @return No return value.
 */
@@ -71,6 +71,11 @@ class TPTSwipingTableViewCell: UITableViewCell {
     var view3:UIView = UIView()
     var view4:UIView = UIView()
     
+    var modeForState1: TPTSwipeTableViewCellMode = .None
+    var modeForState2: TPTSwipeTableViewCellMode = .None
+    var modeForState3: TPTSwipeTableViewCellMode = .None
+    var modeForState4: TPTSwipeTableViewCellMode = .None
+    
     var animationDuration:NSTimeInterval = 0.4
     var damping = 0.6
     var velocity = 0.9
@@ -82,10 +87,7 @@ class TPTSwipingTableViewCell: UITableViewCell {
     var shouldDrag = true
     var shouldAnimateIcons = true
     
-    var modeForState1: TPTSwipeTableViewCellMode = .None
-    var modeForState2: TPTSwipeTableViewCellMode = .None
-    var modeForState3: TPTSwipeTableViewCellMode = .None
-    var modeForState4: TPTSwipeTableViewCellMode = .None
+    @IBOutlet weak var myLabel: UILabel!
     
     // MARK: - Private properties
     var direction:TPTSwipeTableViewCellDirection = .Center
@@ -111,7 +113,7 @@ class TPTSwipingTableViewCell: UITableViewCell {
     }
     
 
-    func setup()
+    private func setup()
     {
         setupDefaults()
         
@@ -121,7 +123,7 @@ class TPTSwipingTableViewCell: UITableViewCell {
         panGestureRecognizer.delegate = self
     }
     
-    func setupDefaults()
+    private func setupDefaults()
     {
         isExited = false
         isDragging = false
@@ -140,17 +142,16 @@ class TPTSwipingTableViewCell: UITableViewCell {
         modeForState2 = .None
         modeForState3 = .None
         modeForState4 = .None
-        
     }
 
 
 
     // MARK: - Public Methods
     func setSwipeGestureWithView(view:UIView,
-        color:UIColor,
-        mode:TPTSwipeTableViewCellMode,
-        state:TPTSwipeTableViewCellState,
-        completionBlock:TPTSwipeCompletionBlock)
+                                color:UIColor,
+                                 mode:TPTSwipeTableViewCellMode,
+                                state:TPTSwipeTableViewCellState,
+                      completionBlock:TPTSwipeCompletionBlock)
     {
         // Depending on the state we assign the attributes
         if (state  == .State1) {
@@ -183,8 +184,34 @@ class TPTSwipingTableViewCell: UITableViewCell {
 
     }
     
-    //- (void)swipeToOriginWithCompletion:(void(^)(void))completion;
-    
+    func swipeToOriginWithCompletion(completion:()->Void) {
+        
+        /*UIView.animateWithDuration(duration:animationDuration,
+        delay:delay,
+        usingSpringWithDamping: damping,
+        initialSpringVelocity: velocity,
+        options: .CurveEaseOut,*/
+        
+        UIView.animateWithDuration(animationDuration, delay:0, options:[UIViewAnimationOptions.CurveEaseOut, UIViewAnimationOptions.AllowUserInteraction],
+            animations: { () -> Void in
+                var frame = self.contentScreenshotView!.frame;
+                frame.origin.x = 0;
+                self.contentScreenshotView!.frame = frame
+                
+                // Clearing the indicator view
+                self.colorIndicatorView!.backgroundColor = self.defaultColor
+                
+                self.slidingView!.alpha = 0;
+                self.slideViewWithPercentage(0, view:self.activeView!, isDragging:false)
+            }, completion: { (Bool) -> Void in
+                
+                self.isExited = false;
+                self.uninstallSwipingView()
+                
+                completion();
+                
+        })
+    }
     
     // MARK: - Private Methods
     
@@ -199,28 +226,13 @@ class TPTSwipingTableViewCell: UITableViewCell {
     
     // MARK: - View Manipulation
     
-    func setupSwipingView()
+    private func setupSwipingView()
     {
         if let _ = contentScreenshotView
         {
             return;
         }
-    
-        // If the content view background is transparent we get the background color.
-        let isContentViewBackgroundClear = !(self.contentView.backgroundColor != nil);
-    
-        if (isContentViewBackgroundClear) {
-            let isBackgroundClear = self.backgroundColor?.isEqual(UIColor.clearColor());
-
-            self.contentView.backgroundColor = (isBackgroundClear != nil) ? UIColor.whiteColor() : self.backgroundColor;
-        }
-    
-        let contentViewScreenshotImage = imageWithView(self);
         
-        if (isContentViewBackgroundClear) {
-            self.contentView.backgroundColor = nil;
-        }
-    
         colorIndicatorView = UIView(frame: self.bounds)
         colorIndicatorView!.autoresizingMask = [.FlexibleHeight, .FlexibleWidth]
         
@@ -237,28 +249,28 @@ class TPTSwipingTableViewCell: UITableViewCell {
         slidingView!.contentMode = .Center
         colorIndicatorView!.addSubview(slidingView!)
     
+        let contentViewScreenshotImage = imageWithView(self);
         contentScreenshotView = UIImageView(image: contentViewScreenshotImage)
         addSubview(contentScreenshotView!)
     }
     
-    func uninstallSwipingView() {
+    private func uninstallSwipingView() {
         if let _ = contentScreenshotView
         {
-            return;
+            slidingView!.removeFromSuperview()
+            slidingView = nil;
+            
+            colorIndicatorView!.removeFromSuperview()
+            colorIndicatorView = nil;
+            
+            self.contentScreenshotView!.removeFromSuperview()
+            self.contentScreenshotView = nil;
         }
-        
-        slidingView!.removeFromSuperview()
-        slidingView = nil;
-        
-        colorIndicatorView!.removeFromSuperview()
-        colorIndicatorView = nil;
-        
-        contentScreenshotView!.removeFromSuperview()
-        contentScreenshotView = nil;
+
     }
     
     
-    func setViewOfSlidingView(newView:UIView?)
+    private func setViewOfSlidingView(newView:UIView?)
     {
         // remove old view
         if let slidingView = slidingView {
@@ -267,16 +279,15 @@ class TPTSwipingTableViewCell: UITableViewCell {
             {
                 view.removeFromSuperview()
             }
+            
+            // add new view
+            slidingView.addSubview(newView!)
         }
-        
-        // add new view
-        slidingView?.addSubview(newView!)
     }
     
     
     func handlePanGestureRecognizer(gesture:UIPanGestureRecognizer )
     {
-        
         if (!shouldDrag || isExited) {
             return
         }
@@ -287,29 +298,29 @@ class TPTSwipingTableViewCell: UITableViewCell {
         
         var percentage:CGFloat = 0
         
-        if let contentView = contentScreenshotView {
-            percentage = percentageWithOffset(CGRectGetMinX(contentView.frame), relativeToWidth:CGRectGetWidth(self.bounds))
+        if let view = contentScreenshotView {
+            percentage = percentageWithOffset(CGRectGetMinX(view.frame), relativeToWidth:CGRectGetWidth(self.bounds))
         }
         
         animationDuration = animationDurationWithVelocity(velocity)
         direction = directionWithPercentage(percentage)
         
-        
         if state == .Began || state == .Changed {
             isDragging = true
-            
             setupSwipingView()
             
-            center = CGPoint(x: contentScreenshotView!.center.x + translation.x, y: contentScreenshotView!.center.y)
-            contentScreenshotView!.center = center;
-            animateWithOffset(CGRectGetMinX(contentScreenshotView!.frame))
-            gesture.setTranslation(CGPointZero, inView:self)
-            
-            // Notifying the delegate that we are dragging with an offset percentage.
-            if let delegate = self.delegate {
-                delegate.swipeTableViewCell(self, didSwipeWithPercentage: percentage)
+            if let view = contentScreenshotView {
+                
+                view.frame.origin.x += translation.x;
+                
+                animateWithOffset(CGRectGetMinX(view.frame))
+                gesture.setTranslation(CGPointZero, inView:self)
+                
+                // Notifying the delegate that we are dragging with an offset percentage.
+                if let delegate = self.delegate {
+                    delegate.swipeTableViewCell(self, didSwipeWithPercentage: percentage)
+                }
             }
-
         }
     
         else if state == .Ended || state == .Cancelled {
@@ -351,19 +362,16 @@ class TPTSwipingTableViewCell: UITableViewCell {
             if let delegate = self.delegate {
                 delegate.swipeTableViewCellDidEndSwiping(self)
             }
-            
         }
     }
     
     // MARK: - Movement
     
-    func animateWithOffset(offset:CGFloat) {
+    private func animateWithOffset(offset:CGFloat) {
         let percentage = percentageWithOffset(offset, relativeToWidth:CGRectGetWidth(self.bounds))
         
-        let view = viewWithPercentage(percentage)
-        
         // View Position.
-        if let view = view {
+        if let view = viewWithPercentage(percentage) {
             setViewOfSlidingView(view)
             slidingView!.alpha = alphaWithPercentage(percentage)
             slideViewWithPercentage(percentage, view:view, isDragging:shouldAnimateIcons)
@@ -371,41 +379,39 @@ class TPTSwipingTableViewCell: UITableViewCell {
         
         // Color
         let color = colorWithPercentage(percentage)
-        
         colorIndicatorView!.backgroundColor = color
-        
     }
     
-    func slideViewWithPercentage(percentage:CGFloat, view:UIView, isDragging:Bool)
+    private func slideViewWithPercentage(percentage:CGFloat, view:UIView, isDragging:Bool)
     {
         var position = CGPointZero
         position.y = CGRectGetHeight(self.bounds) / 2.0;
-        
+
         if isDragging {
             if (percentage >= 0 && percentage < firstTrigger) {
-                position.x = offsetWithPercentage((firstTrigger / 2), relativeToWidth:CGRectGetWidth(self.bounds))
+                position.x = offsetWithPercentage(firstTrigger / 2.0, relativeToWidth:CGRectGetWidth(self.bounds))
             }
                 
             else if (percentage >= firstTrigger) {
-                position.x = offsetWithPercentage(percentage - (firstTrigger / 2), relativeToWidth:CGRectGetWidth(self.bounds))
+                position.x = offsetWithPercentage(percentage - (firstTrigger / 2.0), relativeToWidth:CGRectGetWidth(self.bounds))
             }
                 
             else if (percentage < 0 && percentage >= -firstTrigger) {
-                position.x = CGRectGetWidth(self.bounds) - offsetWithPercentage((firstTrigger / 2), relativeToWidth:CGRectGetWidth(self.bounds))
+                position.x = CGRectGetWidth(self.bounds) - offsetWithPercentage(firstTrigger / 2.0, relativeToWidth:CGRectGetWidth(self.bounds))
             }
                 
             else if (percentage < -firstTrigger) {
-                position.x = CGRectGetWidth(self.bounds) + offsetWithPercentage(percentage + (firstTrigger / 2), relativeToWidth:CGRectGetWidth(self.bounds))
+                position.x = CGRectGetWidth(self.bounds) + offsetWithPercentage(percentage + (firstTrigger / 2.0), relativeToWidth:CGRectGetWidth(self.bounds))
             }
         }
             
         else {
             if direction == .Right {
-                position.x = offsetWithPercentage((firstTrigger / 2), relativeToWidth:CGRectGetWidth(self.bounds))
+                position.x = offsetWithPercentage(firstTrigger / 2.0, relativeToWidth:CGRectGetWidth(self.bounds))
             }
                 
             else if direction == .Left {
-                position.x = CGRectGetWidth(self.bounds) - offsetWithPercentage((firstTrigger / 2), relativeToWidth:CGRectGetWidth(self.bounds))
+                position.x = CGRectGetWidth(self.bounds) - offsetWithPercentage(firstTrigger / 2.0, relativeToWidth:CGRectGetWidth(self.bounds))
             }
                 
             else {
@@ -423,7 +429,7 @@ class TPTSwipingTableViewCell: UITableViewCell {
         slidingView!.frame = activeViewFrame;
     }
     
-    func moveWithDuration(duration:NSTimeInterval, andDirection moveDirection:TPTSwipeTableViewCellDirection) {
+    private func moveWithDuration(duration:NSTimeInterval, andDirection moveDirection:TPTSwipeTableViewCellDirection) {
         
         isExited = true
         var origin:CGFloat
@@ -447,7 +453,7 @@ class TPTSwipingTableViewCell: UITableViewCell {
         // Color
         let color = colorWithPercentage(currentPercentage)
         colorIndicatorView!.backgroundColor = color
-
+        
         UIView.animateWithDuration(duration, delay:0, options:[UIViewAnimationOptions.CurveEaseOut, UIViewAnimationOptions.AllowUserInteraction], animations:{ () -> Void in
             self.contentScreenshotView!.frame = frame;
             self.slidingView!.alpha = 0;
@@ -455,47 +461,13 @@ class TPTSwipingTableViewCell: UITableViewCell {
             }, completion:{ (Bool) -> Void in
                 self.executeCompletionBlock()
             })
-
     }
     
-    func swipeToOriginWithCompletion(completion:()->Void) {
-        
-        /*UIView.animateWithDuration(duration:animationDuration,
-            delay:delay,
-            usingSpringWithDamping: damping,
-            initialSpringVelocity: velocity,
-            options: .CurveEaseOut,*/
-            
-        UIView.animateWithDuration(animationDuration, delay:0, options:[UIViewAnimationOptions.CurveEaseOut, UIViewAnimationOptions.AllowUserInteraction],
-            animations: { () -> Void in
-                var frame = self.contentScreenshotView!.frame;
-                frame.origin.x = 0;
-                self.contentScreenshotView!.frame = frame
-                
-                // Clearing the indicator view
-                self.colorIndicatorView!.backgroundColor = self.defaultColor
-                
-                self.slidingView!.alpha = 0;
-                self.slideViewWithPercentage(0, view:self.activeView!, isDragging:false)
-            }, completion: { (Bool) -> Void in
-                
-                self.isExited = false;
-                self.uninstallSwipingView()
-                
-                completion();
-                
-        })
-        
-        
 
-        
-        
-        
-    }
 
     // MARK: - Percentage
     
-    func offsetWithPercentage(percentage: CGFloat, relativeToWidth width:CGFloat) -> CGFloat
+    private func offsetWithPercentage(percentage: CGFloat, relativeToWidth width:CGFloat) -> CGFloat
     {
         var offset:CGFloat = percentage * width;
         
@@ -510,7 +482,7 @@ class TPTSwipingTableViewCell: UITableViewCell {
         return offset;
     }
     
-    func percentageWithOffset(offset:CGFloat, relativeToWidth width:CGFloat) -> CGFloat
+    private func percentageWithOffset(offset:CGFloat, relativeToWidth width:CGFloat) -> CGFloat
     {
         var percentage:CGFloat = offset / width;
     
@@ -525,7 +497,7 @@ class TPTSwipingTableViewCell: UITableViewCell {
         return percentage
     }
     
-    func animationDurationWithVelocity(velocity:CGPoint) -> NSTimeInterval
+    private func animationDurationWithVelocity(velocity:CGPoint) -> NSTimeInterval
     {
         let width = CGRectGetWidth(self.bounds);
         let animationDurationDiff:NSTimeInterval = kMCDurationHighLimit - kMCDurationLowLimit
@@ -543,7 +515,7 @@ class TPTSwipingTableViewCell: UITableViewCell {
         return NSTimeInterval(CGFloat(kMCDurationHighLimit + kMCDurationLowLimit) - fabs(((horizontalVelocity / width) * CGFloat(animationDurationDiff))));
     }
     
-    func directionWithPercentage(percentage:CGFloat) -> TPTSwipeTableViewCellDirection
+    private func directionWithPercentage(percentage:CGFloat) -> TPTSwipeTableViewCellDirection
     {
         if percentage < 0
         {
@@ -559,7 +531,7 @@ class TPTSwipingTableViewCell: UITableViewCell {
         }
     }
     
-    func viewWithPercentage(percentage:CGFloat) -> UIView?
+    private func viewWithPercentage(percentage:CGFloat) -> UIView?
     {
         
         var view:UIView?
@@ -583,7 +555,7 @@ class TPTSwipingTableViewCell: UITableViewCell {
         return view;
     }
     
-    func alphaWithPercentage(percentage:CGFloat) -> CGFloat {
+    private func alphaWithPercentage(percentage:CGFloat) -> CGFloat {
         var alpha:CGFloat
         
         if percentage >= 0 && percentage < firstTrigger
@@ -602,7 +574,7 @@ class TPTSwipingTableViewCell: UITableViewCell {
         return alpha;
     }
     
-    func colorWithPercentage(percentage:CGFloat) -> UIColor {
+    private func colorWithPercentage(percentage:CGFloat) -> UIColor {
         var color:UIColor
     
         // Background Color
@@ -632,7 +604,7 @@ class TPTSwipingTableViewCell: UITableViewCell {
         return color
     }
     
-    func stateWithPercentage(percentage:CGFloat) -> TPTSwipeTableViewCellState
+    private func stateWithPercentage(percentage:CGFloat) -> TPTSwipeTableViewCellState
     {
         var state:TPTSwipeTableViewCellState = .StateNone;
         
@@ -659,7 +631,7 @@ class TPTSwipingTableViewCell: UITableViewCell {
     
     // MARK: - Utilities
     
-    func imageWithView(view:UIView) -> UIImage
+    private func imageWithView(view:UIView) -> UIImage
     {
         let scale = UIScreen.mainScreen().scale
         UIGraphicsBeginImageContextWithOptions(view.bounds.size, false, scale);
@@ -671,7 +643,7 @@ class TPTSwipingTableViewCell: UITableViewCell {
     
     // MARK: - Completion block
     
-    func executeCompletionBlock() {
+    private func executeCompletionBlock() {
         let state = stateWithPercentage(currentPercentage)
         var mode = TPTSwipeTableViewCellMode.None
         var completionBlock:TPTSwipeCompletionBlock?
@@ -705,6 +677,38 @@ class TPTSwipingTableViewCell: UITableViewCell {
             block(self, state, mode);
         }
         
+    }
+    
+    // MARK: - UIGestureRecognizerDelegate
+    
+    override func gestureRecognizerShouldBegin(gestureRecognizer:UIGestureRecognizer) -> Bool {
+        
+        if (gestureRecognizer.isKindOfClass(UIPanGestureRecognizer)) {
+            
+            let gesture:UIPanGestureRecognizer = gestureRecognizer as! UIPanGestureRecognizer
+            
+            let point = gesture.velocityInView(self)
+            
+            if (fabs(point.x) > fabs(point.y) ) {
+                
+                if (point.x < 0 && modeForState3 == .None && modeForState4 == .None) {
+                    return false
+                }
+                
+                if (point.x > 0 && modeForState1 == .None && modeForState2 == .None) {
+                    return false
+                }
+                
+                // We notify the delegate that we just started dragging
+                if let delegate = self.delegate {
+                    delegate.swipeTableViewCellDidStartSwiping(self)
+                }
+                
+                return true
+            }
+        }
+        
+        return false
     }
     
 }
