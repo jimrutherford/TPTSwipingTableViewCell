@@ -555,6 +555,14 @@ class TPTSwipingTableViewCell: UITableViewCell {
         return 0.0
     }
     
+    
+    private func hasItemsOnSide(side:TPTSwipeTableViewCellSide) -> Bool
+    {
+        let filtered:Array<TPTSwipeCellAction> = actionItems.filter {$0.side == side}
+        
+        return filtered.count > 0
+    }
+    
     // MARK: - Utilities
     
     private func imageWithView(view:UIView) -> UIImage
@@ -596,15 +604,14 @@ class TPTSwipingTableViewCell: UITableViewCell {
             let point = gesture.velocityInView(self)
             
             if (fabs(point.x) > fabs(point.y) ) {
-                /*
-                if (point.x < 0 && modeForState3 == .None && modeForState4 == .None) {
+                // only allow sliding if we have action items on that side
+                if (point.x < 0 && hasItemsOnSide(.Left)) {
                     return false
                 }
                 
-                if (point.x > 0 && modeForState1 == .None && modeForState2 == .None) {
+                if (point.x > 0 && hasItemsOnSide(.Right)) {
                     return false
                 }
-                */
                 
                 // We notify the delegate that we just started dragging
                 if let delegate = self.delegate {

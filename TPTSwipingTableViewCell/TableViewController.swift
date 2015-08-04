@@ -53,7 +53,7 @@ class TableViewController: UITableViewController {
             print("Leave a comment")
         })
         
-        let actionLeft2 = TPTSwipeCellAction(iconName: "config", color: redColor, trigger:0.6, side:.Left, mode: .Switch, completionBlock: { (cell, mode) -> Void in
+        let actionLeft2 = TPTSwipeCellAction(iconName: "config", color: redColor, trigger:0.6, side:.Left, mode: .Exit, completionBlock: { (cell, mode) -> Void in
             print("Do some settings")
         })
         
@@ -66,7 +66,7 @@ class TableViewController: UITableViewController {
             print("Tag! You're it!")
         })
         
-        cell.actionItems = [actionLeft1, actionLeft2, actionRight1, actionRight2]
+        cell.actionItems = [actionLeft1, actionLeft2] //, actionRight1, actionRight2]
         
     }
     
