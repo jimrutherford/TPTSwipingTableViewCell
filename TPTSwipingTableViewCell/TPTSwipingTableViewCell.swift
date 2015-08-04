@@ -37,8 +37,7 @@ enum TPTSwipeTableViewCellDirection:Int {
 /**
 *  `TPTSwipeCompletionBlock`
 *
-*  @param cell  Currently swiped `MCSwipeTableViewCell`.
-*  @param state `TPTSwipeTableViewCellState` which has been triggered.
+*  @param cell  Currently swiped `TPTSwipingTableViewCell`.
 *  @param mode  `TPTSwipeTableViewCellMode` used for for swiping.
 *
 *  @return No return value.
@@ -50,11 +49,11 @@ typealias TPTSwipeCompletionBlock = (TPTSwipingTableViewCell, TPTSwipeTableViewC
 class TPTSwipingTableViewCell: UITableViewCell {
     
     // MARK: - Constants
-    let kMCBounceDuration1:NSTimeInterval      = 0.2  // Duration of the first part of the bounce animation
-    let kMCBounceDuration2:NSTimeInterval      = 0.1  // Duration of the second part of the bounce animation
-    let kMCDurationLowLimit:NSTimeInterval     = 0.25 // Lowest duration when swiping the cell because we try to simulate velocity
-    let kMCDurationHighLimit:NSTimeInterval    = 0.1  // Highest duration when swiping the cell because we try to simulate velocity
-    let kMCBounceAmplitude:CGFloat = 20.0 // Maximum bounce amplitude when using the MCSwipeTableViewCellModeSwitch mode
+    let kTPTBounceDuration1:NSTimeInterval      = 0.2  // Duration of the first part of the bounce animation
+    let kTPTBounceDuration2:NSTimeInterval      = 0.1  // Duration of the second part of the bounce animation
+    let kTPTDurationLowLimit:NSTimeInterval     = 0.25 // Lowest duration when swiping the cell because we try to simulate velocity
+    let kTPTDurationHighLimit:NSTimeInterval    = 0.1  // Highest duration when swiping the cell because we try to simulate velocity
+    let kTPTBounceAmplitude:CGFloat = 20.0 // Maximum bounce amplitude when using the TPTSwipeTableViewCellModeSwitch mode
     
     // MARK: - Public/Internal Properties
     
@@ -425,7 +424,7 @@ class TPTSwipingTableViewCell: UITableViewCell {
     private func animationDurationWithVelocity(velocity:CGPoint) -> NSTimeInterval
     {
         let width = CGRectGetWidth(self.bounds)
-        let animationDurationDiff:NSTimeInterval = kMCDurationHighLimit - kMCDurationLowLimit
+        let animationDurationDiff:NSTimeInterval = kTPTDurationHighLimit - kTPTDurationLowLimit
         var horizontalVelocity:CGFloat = velocity.x
     
         if horizontalVelocity < -width
@@ -437,7 +436,7 @@ class TPTSwipingTableViewCell: UITableViewCell {
             horizontalVelocity = width
         }
     
-        return NSTimeInterval(CGFloat(kMCDurationHighLimit + kMCDurationLowLimit) - fabs(((horizontalVelocity / width) * CGFloat(animationDurationDiff))))
+        return NSTimeInterval(CGFloat(kTPTDurationHighLimit + kTPTDurationLowLimit) - fabs(((horizontalVelocity / width) * CGFloat(animationDurationDiff))))
     }
     
     private func directionWithPercentage(percentage:CGFloat) -> TPTSwipeTableViewCellDirection
@@ -527,25 +526,18 @@ class TPTSwipingTableViewCell: UITableViewCell {
         
         let sorted:Array<TPTSwipeCellAction> = actionItems.filter{$0.side == side}.sort{ $0.trigger < $1.trigger }
         
-        // get first that is < percentage
-        
-        let filtered = sorted.filter{$0.trigger < percentage && $0.side == side}
+        let filtered = sorted.filter{$0.trigger < fabs(percentage) && $0.side == side}
         
         if let result = filtered.last
         {
-            //print("\(percentage) - \(result.iconName)")
             return result
         }
         
         if let result = sorted.first
         {
-            //print("\(percentage) - \(result.iconName)")
             return result
         }
-        
-        //print("NOTHING")
         return nil
-        
     }
     
     
