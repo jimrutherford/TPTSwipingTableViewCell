@@ -49,25 +49,24 @@ class TableViewController: UITableViewController {
         let yellowColor = UIColor(colorLiteralRed:1.0, green:0.85, blue:0.22, alpha:1.0)
         let brownColor = UIColor(colorLiteralRed:0.81, green:0.58, blue:0.38, alpha:1.0)
         
-        let actionLeft1 = TPTSwipeCellAction(iconName: "comment", color: greenColor, trigger:0.25, mode: .Switch, completionBlock: { (cell, mode) -> Void in
+        let actionLeft1 = TPTSwipeCellAction(iconName: "comment", color: greenColor, trigger:0.25, side:.Left, mode: .Switch, completionBlock: { (cell, mode) -> Void in
             
         })
         
-        let actionLeft2 = TPTSwipeCellAction(iconName: "config", color: redColor, trigger:0.75, mode: .Switch, completionBlock: { (cell, mode) -> Void in
+        let actionLeft2 = TPTSwipeCellAction(iconName: "config", color: redColor, trigger:0.6, side:.Left, mode: .Switch, completionBlock: { (cell, mode) -> Void in
             
         })
         
         
-        let actionRight1 = TPTSwipeCellAction(iconName: "heart", color: yellowColor, trigger:0.25, mode: .Switch, completionBlock: { (cell, mode) -> Void in
+        let actionRight1 = TPTSwipeCellAction(iconName: "heart", color: yellowColor, trigger:0.25, side:.Right, mode: .Switch, completionBlock: { (cell, mode) -> Void in
             
         })
         
-        let actionRight2 = TPTSwipeCellAction(iconName: "tag", color: brownColor, trigger:0.75, mode: .Switch, completionBlock: { (cell, mode) -> Void in
+        let actionRight2 = TPTSwipeCellAction(iconName: "tag", color: brownColor, trigger:0.6, side:.Right, mode: .Switch, completionBlock: { (cell, mode) -> Void in
             
         })
         
-        cell.actionItemsLeft = [actionLeft1, actionLeft2]
-        cell.actionItemsRight = [actionRight1, actionRight2]
+        cell.actionItems = [actionLeft1, actionLeft2, actionRight1, actionRight2]
         
     }
     

@@ -12,8 +12,14 @@ struct TPTSwipeCellAction {
     var iconName:String
     var color:UIColor
     var trigger:CGFloat
+    var side:TPTSwipeTableViewCellSide
     var mode: TPTSwipeTableViewCellMode
     var completionBlock:TPTSwipeCompletionBlock?
+}
+
+enum TPTSwipeTableViewCellSide:Int {
+    case Left = 0
+    case Right = 1
 }
 
 enum TPTSwipeTableViewCellMode:Int {
@@ -54,8 +60,7 @@ class TPTSwipingTableViewCell: UITableViewCell {
     
     var delegate: TPTSwipingTableViewCellDelegate?
     
-    var actionItemsLeft = [TPTSwipeCellAction]()
-    var actionItemsRight = [TPTSwipeCellAction]()
+    var actionItems = [TPTSwipeCellAction]()
     
     var defaultColor:UIColor?
     
@@ -305,7 +310,7 @@ class TPTSwipingTableViewCell: UITableViewCell {
         var position = CGPointZero
         position.y = CGRectGetHeight(self.bounds) / 2.0
 
-        let trigger = firstTrigger()
+        let trigger = firstTrigger(percentage)
         
         if isDragging {
             if (percentage >= 0 && percentage < trigger) {
@@ -450,6 +455,18 @@ class TPTSwipingTableViewCell: UITableViewCell {
 
     }
     
+    private func sideWithPercentage(percentage:CGFloat) -> TPTSwipeTableViewCellSide
+    {
+        if percentage < 0
+        {
+            return .Right
+        }
+        else
+        {
+            return .Left
+        }
+    }
+    
     private func viewWithPercentage(percentage:CGFloat) -> UIView?
     {
         if let cellAction = cellActionWithPercentage(percentage)
@@ -461,7 +478,7 @@ class TPTSwipingTableViewCell: UITableViewCell {
     }
     
     private func alphaWithPercentage(percentage:CGFloat) -> CGFloat {
-        let trigger = firstTrigger()
+        let trigger = firstTrigger(percentage)
         
         var alpha:CGFloat
         
@@ -495,7 +512,7 @@ class TPTSwipingTableViewCell: UITableViewCell {
         
         if let cellAction = cellActionWithPercentage(percentage)
         {
-            if (percentage > cellAction.trigger)
+            if (fabs(percentage) > cellAction.trigger)
             {
                 color = cellAction.color
             }
@@ -506,34 +523,37 @@ class TPTSwipingTableViewCell: UITableViewCell {
     
     private func cellActionWithPercentage(percentage:CGFloat) -> TPTSwipeCellAction?
     {
+        let side = sideWithPercentage(percentage)
         
-        let sorted:Array<TPTSwipeCellAction> = actionItemsLeft.sort{ $0.trigger < $1.trigger }
+        let sorted:Array<TPTSwipeCellAction> = actionItems.filter{$0.side == side}.sort{ $0.trigger < $1.trigger }
         
         // get first that is < percentage
         
-        let filtered = sorted.filter{$0.trigger < percentage}
+        let filtered = sorted.filter{$0.trigger < percentage && $0.side == side}
         
         if let result = filtered.last
         {
-            print("\(percentage) - \(result.iconName)")
+            //print("\(percentage) - \(result.iconName)")
             return result
         }
         
         if let result = sorted.first
         {
-            print("\(percentage) - \(result.iconName)")
+            //print("\(percentage) - \(result.iconName)")
             return result
         }
         
-        print("NOTHING")
+        //print("NOTHING")
         return nil
         
     }
     
     
-    private func firstTrigger() -> CGFloat
+    private func firstTrigger(percentage:CGFloat) -> CGFloat
     {
-        let sorted:Array<TPTSwipeCellAction> = actionItemsLeft.sort{ $0.trigger < $1.trigger }
+        let side = sideWithPercentage(percentage)
+        let filtered:Array<TPTSwipeCellAction> = actionItems.filter {$0.side == side}
+        let sorted:Array<TPTSwipeCellAction> = filtered.sort{ $0.trigger < $1.trigger }
         
         if let result = sorted.first
         {
