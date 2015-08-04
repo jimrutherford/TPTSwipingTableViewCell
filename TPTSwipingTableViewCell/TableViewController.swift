@@ -15,9 +15,6 @@ class TableViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        //tableView.delegate = self;
-        //tableView.dataSource = self;
         
         self.tableView.reloadData()
     }
@@ -47,48 +44,31 @@ class TableViewController: UITableViewController {
     {
         cell.defaultColor = UIColor.lightGrayColor()
         
-        let commentView = viewWithImageName("comment")
-        let configView = viewWithImageName("config")
-        let heartView = viewWithImageName("heart")
-        let tagView = viewWithImageName("tag")
-        
         let greenColor = UIColor(colorLiteralRed:0.33, green:0.84, blue:0.31, alpha:1.0)
         let redColor = UIColor(colorLiteralRed:0.91, green:0.24, blue:0.05, alpha:1.0)
         let yellowColor = UIColor(colorLiteralRed:1.0, green:0.85, blue:0.22, alpha:1.0)
         let brownColor = UIColor(colorLiteralRed:0.81, green:0.58, blue:0.38, alpha:1.0)
         
-        cell.setSwipeGestureWithView(commentView, color: greenColor, mode: .Switch, state: .State1, completionBlock: { (cell, state, mode) -> Void in
-            
-            
+        let actionLeft1 = TPTSwipeCellAction(iconName: "comment", color: greenColor, trigger:0.25, mode: .Switch, completionBlock: { (cell, mode) -> Void in
             
         })
         
-        cell.setSwipeGestureWithView(configView, color: redColor, mode: .Switch, state: .State2, completionBlock: { (cell, state, mode) -> Void in
-            
-            
+        let actionLeft2 = TPTSwipeCellAction(iconName: "config", color: redColor, trigger:0.75, mode: .Switch, completionBlock: { (cell, mode) -> Void in
             
         })
         
-        cell.setSwipeGestureWithView(heartView, color: yellowColor, mode: .Switch, state: .State3, completionBlock: { (cell, state, mode) -> Void in
-            
-            
+        
+        let actionRight1 = TPTSwipeCellAction(iconName: "heart", color: yellowColor, trigger:0.25, mode: .Switch, completionBlock: { (cell, mode) -> Void in
             
         })
         
-        cell.setSwipeGestureWithView(tagView, color: brownColor, mode: .Switch, state: .State4, completionBlock: { (cell, state, mode) -> Void in
-            
-            
+        let actionRight2 = TPTSwipeCellAction(iconName: "tag", color: brownColor, trigger:0.75, mode: .Switch, completionBlock: { (cell, mode) -> Void in
             
         })
         
-    }
-    
-    
-    func viewWithImageName(imageName:String) -> UIView {
-        let image = UIImage(named:imageName)
-        let imageView = UIImageView(image: image)
-        imageView.contentMode = .Center
-        return imageView
+        cell.actionItemsLeft = [actionLeft1, actionLeft2]
+        cell.actionItemsRight = [actionRight1, actionRight2]
+        
     }
     
 }

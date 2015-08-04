@@ -8,12 +8,12 @@
 
 import UIKit
 
-enum TPTSwipeTableViewCellState:Int {
-    case StateNone = 0
-    case State1 = 1
-    case State2 = 2
-    case State3 = 3
-    case State4 = 4
+struct TPTSwipeCellAction {
+    var iconName:String
+    var color:UIColor
+    var trigger:CGFloat
+    var mode: TPTSwipeTableViewCellMode
+    var completionBlock:TPTSwipeCompletionBlock?
 }
 
 enum TPTSwipeTableViewCellMode:Int {
@@ -38,7 +38,7 @@ enum TPTSwipeTableViewCellDirection:Int {
 *  @return No return value.
 */
 
-typealias TPTSwipeCompletionBlock = (TPTSwipingTableViewCell, TPTSwipeTableViewCellState, TPTSwipeTableViewCellMode) -> Void
+typealias TPTSwipeCompletionBlock = (TPTSwipingTableViewCell, TPTSwipeTableViewCellMode) -> Void
 
 
 class TPTSwipingTableViewCell: UITableViewCell {
@@ -54,34 +54,14 @@ class TPTSwipingTableViewCell: UITableViewCell {
     
     var delegate: TPTSwipingTableViewCellDelegate?
     
+    var actionItemsLeft = [TPTSwipeCellAction]()
+    var actionItemsRight = [TPTSwipeCellAction]()
+    
     var defaultColor:UIColor?
-    
-    var completionBlock1:TPTSwipeCompletionBlock?
-    var completionBlock2:TPTSwipeCompletionBlock?
-    var completionBlock3:TPTSwipeCompletionBlock?
-    var completionBlock4:TPTSwipeCompletionBlock?
-    
-    var color1:UIColor = UIColor()
-    var color2:UIColor = UIColor()
-    var color3:UIColor = UIColor()
-    var color4:UIColor = UIColor()
-    
-    var view1:UIView = UIView()
-    var view2:UIView = UIView()
-    var view3:UIView = UIView()
-    var view4:UIView = UIView()
-    
-    var modeForState1: TPTSwipeTableViewCellMode = .None
-    var modeForState2: TPTSwipeTableViewCellMode = .None
-    var modeForState3: TPTSwipeTableViewCellMode = .None
-    var modeForState4: TPTSwipeTableViewCellMode = .None
     
     var animationDuration:NSTimeInterval = 0.4
     var damping = 0.6
     var velocity = 0.9
-    
-    var firstTrigger:CGFloat = 0.25
-    var secondTrigger:CGFloat = 0.75
     
     var isDragging = false
     var shouldDrag = true
@@ -130,59 +110,13 @@ class TPTSwipingTableViewCell: UITableViewCell {
         shouldDrag = true
         shouldAnimateIcons = true
         
-        firstTrigger = 0.25
-        secondTrigger = 0.75
         damping = 0.6
         velocity = 0.9
         animationDuration = 0.4
         
         defaultColor = UIColor.whiteColor()
-        
-        modeForState1 = .None
-        modeForState2 = .None
-        modeForState3 = .None
-        modeForState4 = .None
     }
 
-
-
-    // MARK: - Public Methods
-    func setSwipeGestureWithView(view:UIView,
-                                color:UIColor,
-                                 mode:TPTSwipeTableViewCellMode,
-                                state:TPTSwipeTableViewCellState,
-                      completionBlock:TPTSwipeCompletionBlock)
-    {
-        // Depending on the state we assign the attributes
-        if (state  == .State1) {
-            completionBlock1 = completionBlock;
-            view1 = view;
-            color1 = color;
-            modeForState1 = mode;
-        }
-        
-        if (state == .State2) {
-            completionBlock2 = completionBlock;
-            view2 = view;
-            color2 = color;
-            modeForState2 = mode;
-        }
-        
-        if (state == .State3) {
-            completionBlock3 = completionBlock;
-            view3 = view;
-            color3 = color;
-            modeForState3 = mode;
-        }
-        
-        if (state  == .State4) {
-            completionBlock4 = completionBlock;
-            view4 = view;
-            color4 = color;
-            modeForState4 = mode;
-        }
-
-    }
     
     func swipeToOriginWithCompletion(completion:()->Void) {
         
@@ -329,33 +263,17 @@ class TPTSwipingTableViewCell: UITableViewCell {
             activeView = viewWithPercentage(percentage)
             currentPercentage = percentage;
             
-            let cellState:TPTSwipeTableViewCellState = stateWithPercentage(percentage)
-            var cellMode: TPTSwipeTableViewCellMode = .None
-            
-            if cellState == .State1 && modeForState1 != .None {
-                cellMode = self.modeForState1;
-            }
-                
-            else if cellState == .State2 && modeForState2 != .None {
-                cellMode = self.modeForState2;
-            }
-                
-            else if cellState == .State3 && modeForState3 != .None {
-                cellMode = self.modeForState3;
-            }
-                
-            else if cellState == .State4 && modeForState4 != .None {
-                cellMode = self.modeForState4;
-            }
-            
-            if (cellMode == .Exit && direction != .Center) {
-                moveWithDuration(animationDuration, andDirection:direction)
-            }
-                
-            else {
-                swipeToOriginWithCompletion({
-                    self.executeCompletionBlock()
-                })
+            if let cellAction:TPTSwipeCellAction = cellActionWithPercentage(percentage)
+            {
+                if (cellAction.mode == .Exit && direction != .Center) {
+                    moveWithDuration(animationDuration, andDirection:direction)
+                }
+                    
+                else {
+                    swipeToOriginWithCompletion({
+                        self.executeCompletionBlock()
+                    })
+                }
             }
             
             // We notify the delegate that we just ended swiping.
@@ -387,31 +305,33 @@ class TPTSwipingTableViewCell: UITableViewCell {
         var position = CGPointZero
         position.y = CGRectGetHeight(self.bounds) / 2.0;
 
+        let trigger = firstTrigger()
+        
         if isDragging {
-            if (percentage >= 0 && percentage < firstTrigger) {
-                position.x = offsetWithPercentage(firstTrigger / 2.0, relativeToWidth:CGRectGetWidth(self.bounds))
+            if (percentage >= 0 && percentage < trigger) {
+                position.x = offsetWithPercentage(trigger / 2.0, relativeToWidth:CGRectGetWidth(self.bounds))
             }
                 
-            else if (percentage >= firstTrigger) {
-                position.x = offsetWithPercentage(percentage - (firstTrigger / 2.0), relativeToWidth:CGRectGetWidth(self.bounds))
+            else if (percentage >= trigger) {
+                position.x = offsetWithPercentage(percentage - (trigger / 2.0), relativeToWidth:CGRectGetWidth(self.bounds))
             }
                 
-            else if (percentage < 0 && percentage >= -firstTrigger) {
-                position.x = CGRectGetWidth(self.bounds) - offsetWithPercentage(firstTrigger / 2.0, relativeToWidth:CGRectGetWidth(self.bounds))
+            else if (percentage < 0 && percentage >= -trigger) {
+                position.x = CGRectGetWidth(self.bounds) - offsetWithPercentage(trigger / 2.0, relativeToWidth:CGRectGetWidth(self.bounds))
             }
                 
-            else if (percentage < -firstTrigger) {
-                position.x = CGRectGetWidth(self.bounds) + offsetWithPercentage(percentage + (firstTrigger / 2.0), relativeToWidth:CGRectGetWidth(self.bounds))
+            else if (percentage < -trigger) {
+                position.x = CGRectGetWidth(self.bounds) + offsetWithPercentage(percentage + (trigger / 2.0), relativeToWidth:CGRectGetWidth(self.bounds))
             }
         }
             
         else {
             if direction == .Right {
-                position.x = offsetWithPercentage(firstTrigger / 2.0, relativeToWidth:CGRectGetWidth(self.bounds))
+                position.x = offsetWithPercentage(trigger / 2.0, relativeToWidth:CGRectGetWidth(self.bounds))
             }
                 
             else if direction == .Left {
-                position.x = CGRectGetWidth(self.bounds) - offsetWithPercentage(firstTrigger / 2.0, relativeToWidth:CGRectGetWidth(self.bounds))
+                position.x = CGRectGetWidth(self.bounds) - offsetWithPercentage(trigger / 2.0, relativeToWidth:CGRectGetWidth(self.bounds))
             }
                 
             else {
@@ -533,29 +453,16 @@ class TPTSwipingTableViewCell: UITableViewCell {
     
     private func viewWithPercentage(percentage:CGFloat) -> UIView?
     {
-        
-        var view:UIView?
-        
-        if percentage >= 0 && modeForState1 != .None {
-            view = view1
+        if let cellAction = cellActionWithPercentage(percentage)
+        {
+            return viewWithImageName(cellAction.iconName)
         }
         
-        if percentage >= secondTrigger && modeForState2 != .None {
-            view = view2
-        }
-        
-        if percentage < 0  && modeForState3 != .None {
-            view = view3
-        }
-        
-        if percentage <= -secondTrigger && modeForState4 != .None {
-            view = view4;
-        }
-        
-        return view;
+        return nil
     }
     
     private func alphaWithPercentage(percentage:CGFloat) -> CGFloat {
+        /*
         var alpha:CGFloat
         
         if percentage >= 0 && percentage < firstTrigger
@@ -570,11 +477,12 @@ class TPTSwipingTableViewCell: UITableViewCell {
         {
             alpha = 1.0;
         }
-        
-        return alpha;
+        */
+        return 1.0;
     }
     
     private func colorWithPercentage(percentage:CGFloat) -> UIColor {
+        
         var color:UIColor
     
         // Background Color
@@ -585,49 +493,55 @@ class TPTSwipingTableViewCell: UITableViewCell {
             color = UIColor.clearColor()
         }
         
-        if  percentage > firstTrigger && modeForState1 != .None {
-            color = color1;
-        }
-        
-        if percentage > secondTrigger && modeForState2 != .None {
-            color = color2;
-        }
-        
-        if percentage < -firstTrigger && modeForState3 != .None {
-            color = color3;
-        }
-        
-        if percentage <= -secondTrigger && modeForState4 != .None {
-            color = color4;
+        if let cellAction = cellActionWithPercentage(percentage)
+        {
+            if (percentage > cellAction.trigger)
+            {
+                color = cellAction.color
+            }
         }
         
         return color
     }
     
-    private func stateWithPercentage(percentage:CGFloat) -> TPTSwipeTableViewCellState
+    private func cellActionWithPercentage(percentage:CGFloat) -> TPTSwipeCellAction?
     {
-        var state:TPTSwipeTableViewCellState = .StateNone;
         
-        if percentage >= firstTrigger && modeForState1 != .None {
-            state = .State1
+        let sorted:Array<TPTSwipeCellAction> = actionItemsLeft.sort{ $0.trigger < $1.trigger }
+        
+        // get first that is < percentage
+        
+        let filtered = sorted.filter{$0.trigger < percentage}
+        
+        if let result = filtered.last
+        {
+            print("\(percentage) - \(result.iconName)")
+            return result
         }
         
-        if percentage >= secondTrigger && modeForState2 != .None {
-            state = .State2
+        if let result = sorted.first
+        {
+            print("\(percentage) - \(result.iconName)")
+            return result
         }
         
-        if percentage <= -firstTrigger && modeForState3 != .None {
-            state = .State3
-        }
+        print("NOTHING")
+        return nil
         
-        if percentage <= -secondTrigger && modeForState4 != .None {
-            state = .State4
-        }
-        
-        return state
     }
     
     
+    private func firstTrigger() -> CGFloat
+    {
+        let sorted:Array<TPTSwipeCellAction> = actionItemsLeft.sort{ $0.trigger < $1.trigger }
+        
+        if let result = sorted.first
+        {
+            return result.trigger
+        }
+        
+        return 0.0
+    }
     
     // MARK: - Utilities
     
@@ -641,42 +555,22 @@ class TPTSwipingTableViewCell: UITableViewCell {
         return image;
     }
     
+    func viewWithImageName(imageName:String) -> UIView {
+        let image = UIImage(named:imageName)
+        let imageView = UIImageView(image: image)
+        imageView.contentMode = .Center
+        return imageView
+    }
+    
     // MARK: - Completion block
     
     private func executeCompletionBlock() {
-        let state = stateWithPercentage(currentPercentage)
-        var mode = TPTSwipeTableViewCellMode.None
-        var completionBlock:TPTSwipeCompletionBlock?
-        
-        switch (state) {
-        case .State1:
-            mode = self.modeForState1;
-            completionBlock = completionBlock1!
-            break;
-            
-        case .State2:
-            mode = self.modeForState2;
-            completionBlock = completionBlock2;
-            break;
-            
-        case .State3:
-            mode = self.modeForState3;
-            completionBlock = completionBlock3;
-            break;
-            
-        case .State4:
-            mode = self.modeForState4;
-            completionBlock = completionBlock4;
-            break;
-            
-        default:
-            break;
+        if let cellAction = cellActionWithPercentage(currentPercentage)
+        {
+            if let block = cellAction.completionBlock {
+                block(self, cellAction.mode);
+            }
         }
-        
-        if let block = completionBlock {
-            block(self, state, mode);
-        }
-        
     }
     
     // MARK: - UIGestureRecognizerDelegate
@@ -690,7 +584,7 @@ class TPTSwipingTableViewCell: UITableViewCell {
             let point = gesture.velocityInView(self)
             
             if (fabs(point.x) > fabs(point.y) ) {
-                
+                /*
                 if (point.x < 0 && modeForState3 == .None && modeForState4 == .None) {
                     return false
                 }
@@ -698,6 +592,7 @@ class TPTSwipingTableViewCell: UITableViewCell {
                 if (point.x > 0 && modeForState1 == .None && modeForState2 == .None) {
                     return false
                 }
+                */
                 
                 // We notify the delegate that we just started dragging
                 if let delegate = self.delegate {
